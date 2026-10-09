@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import com.revrobotics.jni.CANCommonJNI;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -96,7 +98,7 @@ public class RobotContainer {
   //public static PreussDriveSimulation m_preussDriveSimulation = new PreussDriveSimulation(m_poseEstimatorSubsystem);
   private static final boolean debug = true; // To enable debugging in this module, change false to true.
   public static ShooterSubsystem m_ShooterSubsystem = new ShooterSubsystem(CANConstants.kShooterMotor, CANConstants.kFollowerMotor, CANConstants.kFeederMotor);
-  public static IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem(CANConstants.kIntakeMotor);
+  public static IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem(CANConstants.kIntakeMotor, CANConstants.kIntakeMoterPlus);
   public static IntakeDeploymentSubsystem m_IntakeDeploymentSubsystem = new IntakeDeploymentSubsystem(CANConstants.kIntakeDeploymentMotor);
   public static IndexerSubsystem m_IndexerSubsystem = new IndexerSubsystem(CANConstants.kIndexerMotor);
   public static BellySubsystem m_BellySubsystem = new BellySubsystem(CANConstants.kBellyMotor1, CANConstants.kBellyMotor2);
@@ -322,7 +324,7 @@ public class RobotContainer {
       new InstantCommand(() -> m_ShooterSubsystem.stop(), m_ShooterSubsystem)
     );
     new JoystickButton(leftJoystick, 8).onTrue(
-      new InstantCommand(() -> m_ShooterSubsystem.setFixedRPM(2600), m_ShooterSubsystem)
+      new InstantCommand(() -> m_ShooterSubsystem.setFixedRPM(1000), m_ShooterSubsystem)
     );
     new JoystickButton(leftJoystick, 9).onTrue(   
       new InstantCommand(() -> m_ShooterSubsystem.setFixedRPM(m_ShooterSubsystem.getShooterTargetRPM() - 25.0))

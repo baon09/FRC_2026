@@ -22,7 +22,12 @@ public class IntakeSubsystem extends SubsystemBase {
     // Shooter settings
     private final SparkMax motor;
     private final SparkMaxConfig motorConfig;
-    private final SparkClosedLoopController closedLoopController;    
+    private final SparkClosedLoopController closedLoopController;
+    
+    private final SparkMax motorPlus;
+    private final SparkMaxConfig motorConfigPlus;
+    private final SparkClosedLoopController closedLoopControllerPlus;
+
 
     /* State variables related to addressing intake jams
      */
@@ -33,10 +38,14 @@ public class IntakeSubsystem extends SubsystemBase {
     private double targetOutput = 0.0; // exposes the set point to the class
     
 
-  public IntakeSubsystem(int intakeCANId) {
+  public IntakeSubsystem(int intakeCANId, int intakeCANIdPlus) {
     
     motor = new SparkMax(intakeCANId, MotorType.kBrushless);
     closedLoopController = motor.getClosedLoopController();
+
+    motorPlus = new SparkMax(intakeCANIdPlus, MotorType.kBrushless);
+    closedLoopControllerPlus = motorPlus.getClosedLoopController();
+
 
     /*
      * Create a new SPARK MAX configuration object. This will store the
@@ -46,6 +55,12 @@ public class IntakeSubsystem extends SubsystemBase {
     motorConfig.smartCurrentLimit(IntakeConstants.currentLimit);
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     SmartDashboard.putBoolean("Intake", false);
+
+    motorConfigPlus = new SparkMaxConfig();
+    motorConfigPlus.smartCurrentLimit(IntakeConstants.currentLimit);
+    motorConfigPlus.inverted(true);
+    motorPlus.configure(motorConfigPlus, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    SmartDashboard.putBoolean("IntakePlus", false);
   }
 
     /*
@@ -58,12 +73,12 @@ public class IntakeSubsystem extends SubsystemBase {
     	cycleCounter++;
 	    if( cycleCounter < 10 ) {
 	      closedLoopController.setSetpoint(targetOutput, ControlType.kDutyCycle);
-	} else if( oscillationCounter < 20) { // maybe twice the counter?
+    	} else if( oscillationCounter < 20) { // maybe twice the counter?
 	      closedLoopController.setSetpoint(0, ControlType.kDutyCycle);
-	} else {
+    	} else {
 	    cycleCounter = 0;
 	    oscillationCounter++;
-	}
+    	}
     }
     private void resetOscillation(boolean setPointZero) {
 	    isOscillating = false;
@@ -127,6 +142,7 @@ public class IntakeSubsystem extends SubsystemBase {
     */
 
     closedLoopController.setSetpoint(targetOutput, ControlType.kDutyCycle);
+    closedLoopControllerPlus.setSetpoint(targetOutput, ControlType.kDutyCycle);
   }
 
   
@@ -134,6 +150,8 @@ public class IntakeSubsystem extends SubsystemBase {
     targetOutput = 0.0;
     // resetOscillation(false);
     closedLoopController.setSetpoint(targetOutput, ControlType.kDutyCycle);
+    closedLoopControllerPlus.setSetpoint(targetOutput, ControlType.kDutyCycle);
+
     SmartDashboard.putBoolean("Intake", false);
   }
 

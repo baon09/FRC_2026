@@ -27,11 +27,11 @@ public class IndexerSubsystem extends SubsystemBase {
     private final SparkClosedLoopController closedLoopController; 
     private final boolean debug = false;  
 
-  public IndexerSubsystem(int intakeCANId) {
+  public IndexerSubsystem(int indexerCANId ) {
     if (debug) 
        SmartDashboard.putNumber("Indexer%In", 0);
 
-    motor = new SparkFlex(intakeCANId, MotorType.kBrushless);
+    motor = new SparkFlex(indexerCANId, MotorType.kBrushless);
     closedLoopController = motor.getClosedLoopController();
 
 

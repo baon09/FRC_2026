@@ -49,6 +49,7 @@ public final class Constants {
         //public static final int kElbowMotor2 = 44;
         public static final int kIntakeMotor = 43;
         public static final int kFollowerMotor = 44; // -1 => there is no follower motor. 44 is the assigned value for the follower motor if we had one.
+        public static final int kIntakeMoterPlus = 40; // Added on 2026-10-08 by Bao and Calvin
         public static final int kShooterMotor = 45;
         public static final int kFeederMotor = 46;
         public static final int kIndexerMotor = 47;
@@ -638,7 +639,7 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final double pickupFuelSpeed = 0.75;
+        public static final double pickupFuelSpeed = 0.40;
         public static final double ejectFuelSpeed = -0.35;
         public static final int currentLimit = 60;
         public static final double agitateReversedTime = 0.1; // seconds to reverse intake if stuck
@@ -677,7 +678,7 @@ public final class Constants {
         public static final double maxOutputPercent = 0.8;
         public static final double maxRPM = 6784.0; // Neo Vortex
         public static final double kV = 12.0/maxRPM; // Docs say 1.0 should 
-        public static final double feedFuelRPM = -600;
+        public static final double feedFuelRPM = -1400;
     }
    
     
