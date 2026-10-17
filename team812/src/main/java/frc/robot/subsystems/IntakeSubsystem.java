@@ -54,7 +54,8 @@ public class IntakeSubsystem extends SubsystemBase {
      * configuration parameters for the SPARK MAX that we will set below.
      */
     motorConfig = new SparkMaxConfig();
-    motorConfig.smartCurrentLimit(IntakeConstants.currentLimit);
+    // REV recommends 80A for the NEO Vortex; using (60, 80) allows full 80A dynamic torque while protecting the 40A PDP breaker at stall
+    motorConfig.smartCurrentLimit(IntakeConstants.currentLimit, IntakeConstants.freeCurrentLimit);
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     SmartDashboard.putBoolean("Intake", false);
 
