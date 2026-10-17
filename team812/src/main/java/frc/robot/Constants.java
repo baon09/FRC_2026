@@ -655,9 +655,9 @@ public final class Constants {
         public static final double kIntakeDeploymentShakeDownRPM = 400;
         public static final double kIntakeDeploymentLoweredPosition = -8.0;
         public static final double kIntakeDeploymentLoweringDutyCycle = -0.12; // Controlled lowering duty cycle (~1.5V / ~12A max)
-        public static final double kIntakeDeploymentHoldDownDutyCycle = -0.04; // Strongest holding duty cycle allowed (~5A measured against the hard stop)
+        public static final double kIntakeDeploymentHoldDownDutyCycle = -0.10; // Strongest holding duty cycle allowed (~12A against the hard stop; -0.04 measured ~5A)
         public static final double kIntakeDeploymentMinHoldDownDutyCycle = -0.01; // Weakest holding duty cycle so the arm never goes fully slack
-        public static final double kIntakeDeploymentHoldDownCurrent = 3.0; // Target holding current (Amps)
+        public static final double kIntakeDeploymentHoldDownCurrent = 9.0; // Target holding current (Amps)
         public static final double kIntakeDeploymentHoldDownGain = 0.0008; // Holding duty cycle change per Amp of current error each 20ms loop
         public static final int currentLimit = 60; // Amps (restored to 60A so motor has full torque to lift arm against gravity)
         public static final double kP = 0.0004;
