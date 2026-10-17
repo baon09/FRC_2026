@@ -75,6 +75,7 @@ public class IntakeDeploymentSubsystem extends SubsystemBase {
     motorConfig.inverted(false); // This makes negative RPM deploy the shooter
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig.limitSwitch
+        .forwardLimitSwitchTriggerBehavior(LimitSwitchConfig.Behavior.kKeepMovingMotor)
         .reverseLimitSwitchTriggerBehavior(LimitSwitchConfig.Behavior.kKeepMovingMotor);
     /*
      * Configure the encoder. For this specific example, we are using the

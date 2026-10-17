@@ -658,7 +658,7 @@ public final class Constants {
         public static final double kIntakeDeploymentSnugDutyCycle = -0.12; // Gentle ~1.4V duty cycle to take out slop safely
         public static final double kIntakeDeploymentStallCurrentAmps = 25.0; // Current spike threshold when hard stop is reached
         public static final double kIntakeDeploymentLockdownTimeout = 0.6; // Safety timeout (seconds) after hitting limit switch
-        public static final int currentLimit = 35; // Amps - safe limit for arm/pivot (was 60A)
+        public static final int currentLimit = 60; // Amps (restored to 60A so motor has full torque to lift arm against gravity)
         public static final double kP = 0.0004;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
