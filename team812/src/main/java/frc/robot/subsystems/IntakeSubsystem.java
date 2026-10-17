@@ -11,10 +11,12 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -57,7 +59,13 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("Intake", false);
 
     motorConfigPlus = new SparkMaxConfig();
-    motorConfigPlus.smartCurrentLimit(IntakeConstants.currentLimit);
+
+    // SMART CURRENT LIMIT FOR A NEO 550; WE HAD 60AMPS (THE LIMIT FOR A NEO VORTEX) AND OUR MOTORS STARTED TO BURN/SMOKE
+    motorConfigPlus
+      .smartCurrentLimit(30)
+      .secondaryCurrentLimit(40)
+      .idleMode(IdleMode.kCoast);
+
     motorConfigPlus.inverted(true);
     motorPlus.configure(motorConfigPlus, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     SmartDashboard.putBoolean("IntakePlus", false);
@@ -96,6 +104,9 @@ public class IntakeSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
       double currentAmps = motor.getOutputCurrent();
       SmartDashboard.putNumber("Intake Motor Current", currentAmps);
+
+      double currentAmpsPlus = motorPlus.getOutputCurrent();
+      SmartDashboard.putNumber("IntakePlus Motor Current", currentAmpsPlus);
       /*
       SmartDashboard.putBoolean("Intake Motor Jammed", !isOscillating);
 
@@ -142,7 +153,7 @@ public class IntakeSubsystem extends SubsystemBase {
     */
 
     closedLoopController.setSetpoint(targetOutput, ControlType.kDutyCycle);
-    closedLoopControllerPlus.setSetpoint(targetOutput, ControlType.kDutyCycle);
+    closedLoopControllerPlus.setSetpoint(targetOutput > 0 ? 0.1 : -0.1, ControlType.kDutyCycle);
   }
 
   
@@ -153,6 +164,7 @@ public class IntakeSubsystem extends SubsystemBase {
     closedLoopControllerPlus.setSetpoint(targetOutput, ControlType.kDutyCycle);
 
     SmartDashboard.putBoolean("Intake", false);
+
   }
 
 }
