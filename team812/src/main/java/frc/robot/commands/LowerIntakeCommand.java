@@ -47,8 +47,8 @@ public class LowerIntakeCommand extends Command {
     }
 
     if (m_atBottom) {
-      // Continuously apply gentle holding torque (~4-5 Amps) to keep arm clamped tight down against hard stop
-      m_intakeDeploymentSubsystem.runMotor(IntakeDeploymentConstants.kIntakeDeploymentHoldDownDutyCycle);
+      // Continuously apply gentle, current regulated holding torque to keep arm clamped down against hard stop
+      m_intakeDeploymentSubsystem.holdDown();
     } else {
       m_intakeDeploymentSubsystem.runMotor(IntakeDeploymentConstants.kIntakeDeploymentLoweringDutyCycle);
     }
