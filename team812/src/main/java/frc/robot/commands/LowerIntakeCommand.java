@@ -42,9 +42,8 @@ public class LowerIntakeCommand extends Command {
         // Downward motion is negative, so subtract extra rotations to continue further down:
         m_targetPosition = m_intakeDeploymentSubsystem.getPosition() - IntakeDeploymentConstants.kIntakeDeploymentExtraRotations;
         
-        // Switch to a low duty cycle (~1.4V) instead of velocity PID.
-        // This ensures the motor gently removes backlash and cannot exert excessive stall torque.
-        m_intakeDeploymentSubsystem.runMotor(IntakeDeploymentConstants.kIntakeDeploymentSnugDutyCycle);
+        // Actively drive down with controlled speed to force through mechanical backlash/slop:
+        m_intakeDeploymentSubsystem.setRPM(IntakeDeploymentConstants.kIntakeDeploymentSlowDownRPM);
       }
     }
   }
@@ -70,9 +69,10 @@ public class LowerIntakeCommand extends Command {
     // 1. Finished when the motor completes the extra rotations:
     boolean reachedTarget = m_intakeDeploymentSubsystem.getPosition() <= m_targetPosition;
 
-    // 2. Finished if the motor hits the hard stop (slop already eliminated!).
-    // We wait 60ms to ignore initial switching inrush current.
-    boolean stallDetected = (timeSinceHit > 0.06) 
+    // 2. True stall detection: only if the motor has physically stopped rotating (< 40 RPM)
+    // and is pulling high current against the hard mechanical stop.
+    boolean stallDetected = (timeSinceHit > 0.15) 
+        && (Math.abs(m_intakeDeploymentSubsystem.getRPM()) < 40.0)
         && (m_intakeDeploymentSubsystem.getOutputCurrent() >= IntakeDeploymentConstants.kIntakeDeploymentStallCurrentAmps);
 
     // 3. Safety timeout:
