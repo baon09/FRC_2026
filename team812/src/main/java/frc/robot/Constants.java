@@ -641,7 +641,8 @@ public final class Constants {
     public static final class IntakeConstants {
         public static final double pickupFuelSpeed = 0.75;
         public static final double ejectFuelSpeed = -0.75;
-        public static final int currentLimit = 60;
+        public static final int currentLimit = 60; // Stall limit in Amps to protect 40A PDP breaker during jams
+        public static final int freeCurrentLimit = 80; // REV recommended Vortex current limit (Amps) for dynamic intaking torque
         public static final double agitateReversedTime = 0.1; // seconds to reverse intake if stuck
         public static final double agitateForwardTime = 0.5; // seconds to run intake forward after reversing
     }
