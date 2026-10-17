@@ -201,6 +201,7 @@ public class IntakeDeploymentSubsystem extends SubsystemBase {
   }
 
   public void runMotor(double pOut){
+    targetRPM = 0.0;
     pOut = MathUtil.clamp(pOut, IntakeDeploymentConstants.minOutputPercent, IntakeDeploymentConstants.maxOutputPercent);
     closedLoopController.setSetpoint(pOut, ControlType.kDutyCycle);
   }

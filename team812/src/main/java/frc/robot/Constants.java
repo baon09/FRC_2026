@@ -654,10 +654,7 @@ public final class Constants {
         public static final double kIntakeDeploymentShakeUpRPM = -800;
         public static final double kIntakeDeploymentShakeDownRPM = 400;
         public static final double kIntakeDeploymentLoweredPosition = -8.0;
-        public static final double kIntakeDeploymentExtraRotations = 2.5; // Number of extra motor rotations past limit switch (tune between 2.0 and 3.0)
-        public static final double kIntakeDeploymentSlowDownRPM = -400; // Actively drives down with power to take out arm slop
-        public static final double kIntakeDeploymentStallCurrentAmps = 35.0; // Current threshold when hard stop physically stops rotation
-        public static final double kIntakeDeploymentLockdownTimeout = 1.0; // Safety timeout (seconds) after hitting limit switch
+        public static final double kIntakeDeploymentHoldDownDutyCycle = -0.08; // Continuous gentle holding torque (~1V) to lock arm down against hard stop
         public static final int currentLimit = 60; // Amps (restored to 60A so motor has full torque to lift arm against gravity)
         public static final double kP = 0.0004;
         public static final double kI = 0.0;

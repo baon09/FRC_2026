@@ -12,9 +12,8 @@ import frc.robot.subsystems.IntakeDeploymentSubsystem;
 
 public class LowerIntakeCommand extends Command {
   private final IntakeDeploymentSubsystem m_intakeDeploymentSubsystem;
-  private boolean m_limitSwitchHit = false;
-  private double m_targetPosition = 0.0;
-  private double m_limitHitTimestamp = 0.0;
+  private boolean m_atBottom = false;
+  private double m_startTime = 0.0;
 
   /** Creates a new LowerIntakeCommand. */
   public LowerIntakeCommand(IntakeDeploymentSubsystem intakeDeploymentSubsystem) {
@@ -25,9 +24,8 @@ public class LowerIntakeCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_limitSwitchHit = false;
-    m_targetPosition = 0.0;
-    m_limitHitTimestamp = 0.0;
+    m_atBottom = false;
+    m_startTime = Timer.getFPGATimestamp();
     m_intakeDeploymentSubsystem.setRPM(IntakeDeploymentConstants.kIntakeDeploymentDownRPM);
     RobotContainer.setRaisingIntake(false);
   }
@@ -35,16 +33,19 @@ public class LowerIntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!m_limitSwitchHit) {
-      if (m_intakeDeploymentSubsystem.isRevLimitSwitchPressed()) {
-        m_limitSwitchHit = true;
-        m_limitHitTimestamp = Timer.getFPGATimestamp();
-        // Downward motion is negative, so subtract extra rotations to continue further down:
-        m_targetPosition = m_intakeDeploymentSubsystem.getPosition() - IntakeDeploymentConstants.kIntakeDeploymentExtraRotations;
-        
-        // Actively drive down with controlled speed to force through mechanical backlash/slop:
-        m_intakeDeploymentSubsystem.setRPM(IntakeDeploymentConstants.kIntakeDeploymentSlowDownRPM);
+    double elapsedTime = Timer.getFPGATimestamp() - m_startTime;
+
+    // Detect reaching bottom either via reverse limit switch or when motor slows against hard stop
+    if (!m_atBottom) {
+      if (m_intakeDeploymentSubsystem.isRevLimitSwitchPressed()
+          || (elapsedTime > 0.3 && Math.abs(m_intakeDeploymentSubsystem.getRPM()) < 50.0)) {
+        m_atBottom = true;
       }
+    }
+
+    if (m_atBottom) {
+      // Continuously apply gentle holding torque to keep arm clamped tight down against hard stop
+      m_intakeDeploymentSubsystem.runMotor(IntakeDeploymentConstants.kIntakeDeploymentHoldDownDutyCycle);
     }
   }
 
@@ -52,32 +53,12 @@ public class LowerIntakeCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     m_intakeDeploymentSubsystem.stop();
-    // Zero the encoder at the fully lowered / seated position
-    if (!interrupted && m_limitSwitchHit) {
-      m_intakeDeploymentSubsystem.resetEncoder(0.0);
-    }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (!m_limitSwitchHit) {
-      return false;
-    }
-    double timeSinceHit = Timer.getFPGATimestamp() - m_limitHitTimestamp;
-
-    // 1. Finished when the motor completes the extra rotations:
-    boolean reachedTarget = m_intakeDeploymentSubsystem.getPosition() <= m_targetPosition;
-
-    // 2. True stall detection: only if the motor has physically stopped rotating (< 40 RPM)
-    // and is pulling high current against the hard mechanical stop.
-    boolean stallDetected = (timeSinceHit > 0.15) 
-        && (Math.abs(m_intakeDeploymentSubsystem.getRPM()) < 40.0)
-        && (m_intakeDeploymentSubsystem.getOutputCurrent() >= IntakeDeploymentConstants.kIntakeDeploymentStallCurrentAmps);
-
-    // 3. Safety timeout:
-    boolean timedOut = timeSinceHit >= IntakeDeploymentConstants.kIntakeDeploymentLockdownTimeout;
-
-    return reachedTarget || stallDetected || timedOut;
+    // Keep running and holding torque down until interrupted (e.g. by RaiseIntakeCommand)
+    return false;
   }
 }
