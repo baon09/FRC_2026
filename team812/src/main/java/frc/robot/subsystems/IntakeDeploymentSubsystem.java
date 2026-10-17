@@ -51,6 +51,7 @@ public class IntakeDeploymentSubsystem extends SubsystemBase {
     private boolean m_atFwdLimit = true; // dont allow motion until after periodic sets this.
     private boolean m_atRevLimit = true; // dont allow motion until after periodic sets this.
     private double m_position = 0.0; // 0.0 is the fully raised position.
+    private boolean m_holdDown = false; // true while the intake is deployed and should be clamped against the bottom hard stop.
     private final boolean debug = true;
 
   public IntakeDeploymentSubsystem(int intakedeploymentCANId) {
@@ -178,6 +179,8 @@ public class IntakeDeploymentSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("IntakeRevLimit", m_atRevLimit); 
     SmartDashboard.putBoolean("IntakeUp", m_atFwdLimit);
     SmartDashboard.putBoolean("IntakeDown", m_atRevLimit);
+    SmartDashboard.putBoolean("Intake Hold Down", m_holdDown);
+    SmartDashboard.putString("Intake Deployment Command", getCurrentCommand() == null ? "none" : getCurrentCommand().getName());
   }
 
   public boolean isRevLimitSwitchPressed() {
@@ -235,9 +238,30 @@ public class IntakeDeploymentSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("IntakeDeployment Target Position", this.targetPosition);
   }
 
+  /**
+   * stop - stop active motion. If the intake is deployed (hold down mode), keep applying
+   * the gentle hold-down torque instead of cutting power so the arm stays pinned against
+   * the bottom hard stop when a command using the intake ends or is interrupted.
+   */
   public void stop() {
-    closedLoopController.setSetpoint(0, ControlType.kDutyCycle);
+    if (m_holdDown) {
+      closedLoopController.setSetpoint(IntakeDeploymentConstants.kIntakeDeploymentHoldDownDutyCycle, ControlType.kDutyCycle);
+    } else {
+      closedLoopController.setSetpoint(0, ControlType.kDutyCycle);
+    }
     targetRPM = 0.0;
+  }
+
+  /**
+   * setHoldDown - set whether the intake is deployed and should be held down.
+   * @param holdDown (boolean) true when lowering the intake, false when raising it.
+   */
+  public void setHoldDown(boolean holdDown) {
+    m_holdDown = holdDown;
+  }
+
+  public boolean isHoldDown() {
+    return m_holdDown;
   }
 
   @Override

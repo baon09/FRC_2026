@@ -26,6 +26,7 @@ public class LowerIntakeCommand extends Command {
   public void initialize() {
     m_atBottom = false;
     m_startTime = Timer.getFPGATimestamp();
+    m_intakeDeploymentSubsystem.setHoldDown(true);
     // Use low-power duty cycle to lower, NEVER velocity PID into a hard stop
     m_intakeDeploymentSubsystem.runMotor(IntakeDeploymentConstants.kIntakeDeploymentLoweringDutyCycle);
     RobotContainer.setRaisingIntake(false);
@@ -56,6 +57,7 @@ public class LowerIntakeCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // Hold down mode is set, so stop() keeps the holding torque applied instead of cutting power.
     m_intakeDeploymentSubsystem.stop();
   }
 
