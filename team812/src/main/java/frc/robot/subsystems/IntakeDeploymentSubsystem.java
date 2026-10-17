@@ -15,6 +15,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
@@ -73,6 +74,8 @@ public class IntakeDeploymentSubsystem extends SubsystemBase {
     //motorFollowerConfig = new SparkFlexConfig();
     motorConfig.inverted(false); // This makes negative RPM deploy the shooter
     motorConfig.idleMode(IdleMode.kBrake);
+    motorConfig.limitSwitch
+        .reverseLimitSwitchTriggerBehavior(LimitSwitchConfig.Behavior.kKeepMovingMotor);
     /*
      * Configure the encoder. For this specific example, we are using the
      * integrated encoder of the NEO, and we don't need to configure it. If
@@ -110,7 +113,7 @@ public class IntakeDeploymentSubsystem extends SubsystemBase {
         .feedForward
           // kV is now in Volts, so we multiply by the nominal voltage (12V)
           .kV(IntakeDeploymentConstants.kV);
-      motorConfig.smartCurrentLimit(60);
+      motorConfig.smartCurrentLimit(IntakeDeploymentConstants.currentLimit);
 
     /*
      * Apply the configuration to the SPARK MAX.
@@ -174,8 +177,22 @@ public class IntakeDeploymentSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("IntakeRevLimit", m_atRevLimit); 
     SmartDashboard.putBoolean("IntakeUp", m_atFwdLimit);
     SmartDashboard.putBoolean("IntakeDown", m_atRevLimit);
+  }
 
-    if (m_atRevLimit) encoder.setPosition(0.0);
+  public boolean isRevLimitSwitchPressed() {
+    return m_atRevLimit;
+  }
+
+  public void resetEncoder() {
+    encoder.setPosition(0.0);
+  }
+
+  public void resetEncoder(double position) {
+    encoder.setPosition(position);
+  }
+
+  public double getOutputCurrent() {
+    return motor1.getOutputCurrent();
   }
 
   public double getPosition() {

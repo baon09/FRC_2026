@@ -653,6 +653,12 @@ public final class Constants {
         public static final double kIntakeDeploymentShakeUpRPM = -800;
         public static final double kIntakeDeploymentShakeDownRPM = 400;
         public static final double kIntakeDeploymentLoweredPosition = -8.0;
+        public static final double kIntakeDeploymentExtraRotations = 2.5; // Number of extra motor rotations past limit switch (tune between 2.0 and 3.0)
+        public static final double kIntakeDeploymentSlowDownRPM = -200; // Slower speed to snug down against hardstop without slamming
+        public static final double kIntakeDeploymentSnugDutyCycle = -0.12; // Gentle ~1.4V duty cycle to take out slop safely
+        public static final double kIntakeDeploymentStallCurrentAmps = 25.0; // Current spike threshold when hard stop is reached
+        public static final double kIntakeDeploymentLockdownTimeout = 0.6; // Safety timeout (seconds) after hitting limit switch
+        public static final int currentLimit = 35; // Amps - safe limit for arm/pivot (was 60A)
         public static final double kP = 0.0004;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
