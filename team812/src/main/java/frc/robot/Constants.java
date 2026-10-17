@@ -654,7 +654,8 @@ public final class Constants {
         public static final double kIntakeDeploymentShakeUpRPM = -800;
         public static final double kIntakeDeploymentShakeDownRPM = 400;
         public static final double kIntakeDeploymentLoweredPosition = -8.0;
-        public static final double kIntakeDeploymentHoldDownDutyCycle = -0.08; // Continuous gentle holding torque (~1V) to lock arm down against hard stop
+        public static final double kIntakeDeploymentLoweringDutyCycle = -0.12; // Controlled lowering duty cycle (~1.5V / ~12A max)
+        public static final double kIntakeDeploymentHoldDownDutyCycle = -0.04; // Gentle holding torque (~0.5V / ~4-5A safe continuous stall)
         public static final int currentLimit = 60; // Amps (restored to 60A so motor has full torque to lift arm against gravity)
         public static final double kP = 0.0004;
         public static final double kI = 0.0;

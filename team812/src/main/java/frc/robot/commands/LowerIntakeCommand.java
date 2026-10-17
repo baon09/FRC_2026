@@ -26,7 +26,8 @@ public class LowerIntakeCommand extends Command {
   public void initialize() {
     m_atBottom = false;
     m_startTime = Timer.getFPGATimestamp();
-    m_intakeDeploymentSubsystem.setRPM(IntakeDeploymentConstants.kIntakeDeploymentDownRPM);
+    // Use low-power duty cycle to lower, NEVER velocity PID into a hard stop
+    m_intakeDeploymentSubsystem.runMotor(IntakeDeploymentConstants.kIntakeDeploymentLoweringDutyCycle);
     RobotContainer.setRaisingIntake(false);
   }
 
@@ -35,17 +36,20 @@ public class LowerIntakeCommand extends Command {
   public void execute() {
     double elapsedTime = Timer.getFPGATimestamp() - m_startTime;
 
-    // Detect reaching bottom either via reverse limit switch or when motor slows against hard stop
+    // Detect bottom either via reverse limit switch, motor stall, or after 0.8s max lowering
     if (!m_atBottom) {
       if (m_intakeDeploymentSubsystem.isRevLimitSwitchPressed()
-          || (elapsedTime > 0.3 && Math.abs(m_intakeDeploymentSubsystem.getRPM()) < 50.0)) {
+          || (elapsedTime > 0.4 && Math.abs(m_intakeDeploymentSubsystem.getRPM()) < 50.0)
+          || elapsedTime > 0.8) {
         m_atBottom = true;
       }
     }
 
     if (m_atBottom) {
-      // Continuously apply gentle holding torque to keep arm clamped tight down against hard stop
+      // Continuously apply gentle holding torque (~4-5 Amps) to keep arm clamped tight down against hard stop
       m_intakeDeploymentSubsystem.runMotor(IntakeDeploymentConstants.kIntakeDeploymentHoldDownDutyCycle);
+    } else {
+      m_intakeDeploymentSubsystem.runMotor(IntakeDeploymentConstants.kIntakeDeploymentLoweringDutyCycle);
     }
   }
 
